@@ -6,15 +6,15 @@ import express from 'express';
 
 
 // Flight status codees
-constant STATUS_CODE_UNKNOWN = 0;
-constant STATUS_CODE_ON_TIME = 10;
-constant STATUS_CODE_LATE_AIRLINE = 20;
-constant STATUS_CODE_LATE_WEATHER = 30;
-constant STATUS_CODE_LATE_TECHNICAL = 40;
-constant STATUS_CODE_LATE_OTHER = 50;
+const STATUS_CODE_UNKNOWN = 0;
+const STATUS_CODE_ON_TIME = 10;
+const STATUS_CODE_LATE_AIRLINE = 20;
+const STATUS_CODE_LATE_WEATHER = 30;
+const STATUS_CODE_LATE_TECHNICAL = 40;
+const STATUS_CODE_LATE_OTHER = 50;
 const ORACLES_COUNT = 20; 
 const STATUSCODES  = [STATUS_CODE_UNKNOWN, STATUS_CODE_ON_TIME, STATUS_CODE_LATE_AIRLINE, STATUS_CODE_LATE_WEATHER, STATUS_CODE_LATE_TECHNICAL, STATUS_CODE_LATE_OTHER];
- /* // Track all registered oracles
+  // Track all registered oracles
  let oracles= {};
 let config = Config['localhost'];
 let web3 = new Web3(new Web3.providers.WebsocketProvider(config.url.replace('http', 'ws')));
@@ -22,14 +22,28 @@ web3.eth.defaultAccount = web3.eth.accounts[0];
 let flightSuretyApp = new web3.eth.Contract(FlightSuretyApp.abi, config.appAddress);
 let flightSuretyData = new web3.eth.Contract(FlightSuretyData.abi, config.dataAddress);
 
+web3.eth.getAccounts((error, accounts) => {
+  flightSuretyData.methods.authorizeCaller(config.appAddress)
+                          .send({ from: accounts[0] }, (error, result) => {
+                         if(error) {
+                              console.log(error);
+                         } else {
+                            console.log("registered appAddress as the authorized contract of dataContract");
+                             }
+                     });
+             });
 // ARRANGE
+
+/* const registerOracles = async() => {
+
+
 let fee = await flightSuretyApp.REGISTRATION_FEE.call();
-//var registerOracle = async function(){
-      web3.eth.getAccounts((error, accounts) => {
+
+     web3.eth.getAccounts((error, accounts) => {
         for(let a=12; a<ORACLES_COUNT; a++) { 
           try {
-              await flightSuretyApp.methods.registerOracle({ from: accounts[a], value: fee });             
-              let result = await flightSuretyApp.methods.getMyIndexes({from: accounts[a]});
+              flightSuretyApp.methods.registerOracle({ from: accounts[a], value: fee });             
+              let result = flightSuretyApp.methods.getMyIndexes({from: accounts[a]});
               oracles[accounts[a]] = result;
               console.log("registered oracle with address:" + accounts[a]);
               } 
@@ -39,9 +53,10 @@ let fee = await flightSuretyApp.REGISTRATION_FEE.call();
     
         }
       })
-//}
+    } */
 
-//registerOracle();
+
+//registerOracles();
 
 flightSuretyApp.events.OracleRequest({
     fromBlock: 0
@@ -74,7 +89,7 @@ flightSuretyApp.events.OracleRequest({
 
     }
     
-}); */
+}); 
 
 const app = express();
 app.get('/api', (req, res) => {
