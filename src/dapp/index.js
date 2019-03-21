@@ -10,6 +10,13 @@ import './flightsurety.css';
 
     let contract = new Contract('localhost', () => {
 
+        contract.flightSuretyApp.FlightStatusInfo().watch({}, '', function(error, result) {
+            if (!error) {
+                display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.args.airline } ]);
+                //console.log("Error in transaction");
+                //console.log("Airline:\n" + result.args.airline) ;
+            }
+        }) 
         // Read transaction
         contract.isOperational((error, result) => {
             console.log(error,result);
@@ -22,7 +29,8 @@ import './flightsurety.css';
             let flight = DOM.elid('flight-number').value;
             // Write transaction
             contract.fetchFlightStatus(flight, (error, result) => {
-                display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result + ' ' + result.flight + ' ' + result.timestamp} ]);
+                //display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result + ' ' + result.flight + ' ' + result.timestamp} ]);
+                //display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result } ]);
             });
         })
     

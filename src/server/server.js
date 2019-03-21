@@ -73,7 +73,7 @@ flightSuretyApp.events.OracleRequest({
         {          
           let randomstatusCode = STATUSCODES[Math.floor(Math.random()*STATUSCODES.length)];
           flightSuretyApp.methods.submitOracleResponse(index, airline, flight, timestamp, randomstatusCode)
-          .send({ from: key},(error,result)=>
+         /*  .send({ from: key},(error,result)=>
         {
           if(error)
           {
@@ -83,14 +83,14 @@ flightSuretyApp.events.OracleRequest({
           {
             console.log("Oracle response sent with statuscode:"+  randomstatusCode + " for "+ flight)
           }
-        })
-          /* .send({ from: key})
+        }) */
+          .send({ from: key})
           .then(result =>{
             console.log("Oracle response sent with statuscode: "  + randomstatusCode + " for "+ flight)
           })
           .catch(error =>{
             console.log("Error while sending Oracle response  for "+ flight)
-          });   */        
+          });      
            
         }
       }
