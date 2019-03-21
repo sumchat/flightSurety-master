@@ -375,6 +375,7 @@ contract FlightSuretyApp {
                         )
                         external
                         requireIsOperational
+                       
     {
         require((oracles[msg.sender].indexes[0] == index) || (oracles[msg.sender].indexes[1] == index) || (oracles[msg.sender].indexes[2] == index), "Index does not match oracle request");
 
@@ -386,17 +387,19 @@ contract FlightSuretyApp {
 
         // Information isn't considered verified until at least MIN_RESPONSES
         // oracles respond with the *** same *** information
-        //emit OracleReport(airline, flight, timestamp, statusCode);
+        emit OracleReport(airline, flight, timestamp, statusCode);
         if (oracleResponses[key].responses[statusCode].length >= MIN_RESPONSES) {
 
              
-                oracleResponses[key].isOpen = false;
+                //oracleResponses[key].isOpen = false;
+               //return (airline, flight, timestamp, statusCode);
 
             emit FlightStatusInfo(airline, flight, timestamp, statusCode);
 
             // Handle flight status as appropriate
             processFlightStatus(airline, flight, timestamp, statusCode);
         }
+        
     }
 
 
