@@ -12,7 +12,7 @@ const STATUS_CODE_LATE_AIRLINE = 20;
 const STATUS_CODE_LATE_WEATHER = 30;
 const STATUS_CODE_LATE_TECHNICAL = 40;
 const STATUS_CODE_LATE_OTHER = 50;
-const ORACLES_COUNT = 40; 
+const ORACLES_COUNT = 30; 
 const STATUSCODES  = [STATUS_CODE_UNKNOWN, STATUS_CODE_ON_TIME, STATUS_CODE_LATE_AIRLINE, STATUS_CODE_LATE_WEATHER, STATUS_CODE_LATE_TECHNICAL, STATUS_CODE_LATE_OTHER];
   // Track all registered oracles
  let oracles= {};
@@ -34,7 +34,7 @@ web3.eth.getAccounts().then((accounts) => {
       console.log("Error in authorizing appcontract. " + error);
     });
      flightSuretyApp.methods.REGISTRATION_FEE().call().then(fee => {
-      for(let a=12; a<ORACLES_COUNT; a++) {
+      for(let a=1; a<ORACLES_COUNT; a++) {
         flightSuretyApp.methods.registerOracle()
         .send({ from: accounts[a], value: fee,gas:4000000 })
         .then(result=>{
@@ -73,13 +73,24 @@ flightSuretyApp.events.OracleRequest({
         {          
           let randomstatusCode = STATUSCODES[Math.floor(Math.random()*STATUSCODES.length)];
           flightSuretyApp.methods.submitOracleResponse(index, airline, flight, timestamp, randomstatusCode)
-          .send({ from: key})
+          .send({ from: key},(error,result)=>
+        {
+          if(error)
+          {
+          console.log("Error while sending Oracle response  for "+ flight);
+          }
+          else
+          {
+            console.log("Oracle response sent with statuscode:"+  randomstatusCode + " for "+ flight)
+          }
+        })
+          /* .send({ from: key})
           .then(result =>{
-            console.log("Oracle response sent with statuscode:" + randomstatusCode + " for "+ flight)
+            console.log("Oracle response sent with statuscode: "  + randomstatusCode + " for "+ flight)
           })
           .catch(error =>{
             console.log("Error while sending Oracle response  for "+ flight)
-          });          
+          });   */        
            
         }
       }

@@ -20,12 +20,50 @@
     </nav>
 
     <main class="container">
-
+            
         <div id="display-wrapper" class="top-20">
         </div>
-        <div class="row top-20">
-            <label class="form">Flight</label> <input type="text" id="flight-number"> <btn class="btn btn-primary" id="submit-oracle">Submit to Oracles</btn>
+        
+        <div style="border:1px solid white" class="mb-2">     
+        <h4>Register Airline</h4>
+  <form class="form-inline mb-2" >
+        
+                <label for="registeredairline" class="mr-sm-2">Choose Your Airline</label> <input type="text" class="form-control mb-2 mr-sm-1" id="registeredairline">
+                <label for="toregisterairline" class="mr-sm-2">Airline To Register</label> <input type="text" class="form-control mb-2 mr-sm-1" id="toregisterairline">
+                <label for="airlineaddress" class="mr-sm-2">Airline Address</label> <input type="text" class="form-control  mb-2 mr-sm-1" id="airlineaddress">
+                <btn class="btn btn-primary" id="register-Flight">Register Airline</btn>
+  </form>
+  </div>
+  <div style="border:1px solid white" class="mb-2">
+  <h4>Fund Airline</h4>
+  <form class="form-inline mb-2" >
+        
+                <label for="chooseairline" class="mr-sm-2">Choose Your Airline</label> <input type="text" class="form-control mb-2 mr-sm-1" id="chooseairline">
+                <label for="fundAirline" class="mr-sm-2">Add Funds</label> <input type="text" class="form-control mb-2 mr-sm-1" id="fundAirline">
+                <btn class="btn btn-primary" id="fund-Flight">Add Fund</btn>
+  </form>
+</div> 
+<div style="border:1px solid white" class="mb-2">
+  <h4>Purchase Insurance</h4>
+        <form class="form-inline mb-2" >
+                
+                <label for="insuredairline" class="mr-sm-2">Choose Your Airline</label> <input type="text" class="form-control mb-2 mr-sm-1" id="insuredairline">
+                <label for="addinsurance" class="mr-sm-2">Add Funds </label> <input type="text" class="form-control mb-2 mr-sm-1" id="addinsurance">
+                <btn class="btn btn-primary" id="register-insurance">Purchase Insurance</btn>
+        </form>
+</div>
+<div style="border:1px solid white" class="mb-2">
+        <h4>Get Flight Status</h4>
+       <!-- <div class="row top-20">-->
+            <form class="form-inline mb-2" >
+            <label for="flight-number" class="mr-sm-2">Flight</label> <input type="text" class="form-control mb-2 mr-sm-1" id="flight-number"> <btn class="btn btn-primary" id="submit-oracle">Submit to Oracles</btn>
+            </form>
+       <!-- </div>-->
+    </div>
+        <div id="display-wrapper" class="top-20">
         </div>
+       
+        
     </main>
 
 </body>

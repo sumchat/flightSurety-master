@@ -216,7 +216,7 @@ contract FlightSuretyApp {
 
    /**
     * @dev Register a future flight for insuring.Timestamp is the departure time of a flight.
-    *       he will be able to purchase insurance before flight departure
+    *       Purchase Flight insurance before flight departure
     */  
     function registerFlight
                                 (
