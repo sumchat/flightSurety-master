@@ -210,7 +210,7 @@ contract FlightSuretyApp {
       
         // Transfer Fund to Data Contract
         address(_flightSuretyData).transfer(msg.value);
-        _flightSuretyData.fundAirline(msg.sender);
+        _flightSuretyData.fundAirline(msg.sender,msg.value);
     }
 
 
@@ -391,7 +391,7 @@ contract FlightSuretyApp {
         if (oracleResponses[key].responses[statusCode].length >= MIN_RESPONSES) {
 
              
-                //oracleResponses[key].isOpen = false;
+                oracleResponses[key].isOpen = false;
                //return (airline, flight, timestamp, statusCode);
 
             emit FlightStatusInfo(airline, flight, timestamp, statusCode);
@@ -460,6 +460,29 @@ contract FlightSuretyApp {
         return random;
     }
 
+    function getExistingAirlines
+                            (
+
+                            )
+                             public
+                             view
+                            returns(address[])
+        {
+         return _flightSuretyData.getAirlines();
+        }
+
+        function getAirlineFunds
+                            (
+                            address airline
+                            )
+                             public
+                             view
+                            returns(uint funds)
+        {
+         return _flightSuretyData.getAirlineFunds(airline);
+        }
+
+
 // endregion
 
 }  
@@ -470,8 +493,11 @@ contract FlightSuretyData {
     function isAirlineRegistered(address airline) public view returns (bool);   
     function isAirlineFunded(address airline) public view returns (bool);
     function registerAirline(address airline) external returns (bool success);
-    function fundAirline(address airline) external;    
+    function fundAirline(address airline,uint amount) external;    
     function buy(address airline, string flight, uint256 timestamp,address sender, uint256 amount) external;
     function creditInsurees(address airline, string flight, uint256 timestamp) external;
-    
+    function getAirlines() external view returns(address[]);
+    function getAirlineFunds(address airline) external view  returns(uint funds);                       
+                                   
+                            
 }

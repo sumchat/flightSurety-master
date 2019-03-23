@@ -28,28 +28,38 @@
         <h4>Register Airline</h4>
   <form class="form-inline mb-2" >
         
-                <label for="registeredairline" class="mr-sm-2">Choose Your Airline</label> <input type="text" class="form-control mb-2 mr-sm-1" id="registeredairline">
-                <label for="toregisterairline" class="mr-sm-2">Airline To Register</label> <input type="text" class="form-control mb-2 mr-sm-1" id="toregisterairline">
-                <label for="airlineaddress" class="mr-sm-2">Airline Address</label> <input type="text" class="form-control  mb-2 mr-sm-1" id="airlineaddress">
-                <btn class="btn btn-primary" id="register-Flight">Register Airline</btn>
+                <label for="registeredairline" class="mr-sm-2">Choose Your Airline</label>                 
+                 <select class="form-control" id="registeredairline">                       
+                      </select>               
+               
+                <label for="airlineaddress" class="mr-sm-2">To registerAirline Address</label> <input type="text" class="form-control  mb-2 mr-sm-1" id="airlineaddress">
+                <btn class="btn btn-primary" id="register-Airline">Register Airline</btn>
   </form>
   </div>
   <div style="border:1px solid white" class="mb-2">
   <h4>Fund Airline</h4>
   <form class="form-inline mb-2" >
         
-                <label for="chooseairline" class="mr-sm-2">Choose Your Airline</label> <input type="text" class="form-control mb-2 mr-sm-1" id="chooseairline">
+                <label for="fundingairline" class="mr-sm-2">Choose Your Airline</label> 
+                <select class="form-control" id="fundingairline">                       
+                </select> 
+                <!-- <input type="text" class="form-control mb-2 mr-sm-1" id="fundingairline"> -->
                 <label for="fundAirline" class="mr-sm-2">Add Funds</label> <input type="text" class="form-control mb-2 mr-sm-1" id="fundAirline">
-                <btn class="btn btn-primary" id="fund-Flight">Add Fund</btn>
+                <label for="funds" class="mr-sm-2">Total Remaining Funds</label> <input type="text" readonly class="form-control mb-2 mr-sm-1" id="funds">
+                <btn class="btn btn-primary" id="fund-airline">Add Fund</btn>
   </form>
 </div> 
 <div style="border:1px solid white" class="mb-2">
   <h4>Purchase Insurance</h4>
         <form class="form-inline mb-2" >
                 
-                <label for="insuredairline" class="mr-sm-2">Choose Your Airline</label> <input type="text" class="form-control mb-2 mr-sm-1" id="insuredairline">
-                <label for="addinsurance" class="mr-sm-2">Add Funds </label> <input type="text" class="form-control mb-2 mr-sm-1" id="addinsurance">
-                <btn class="btn btn-primary" id="register-insurance">Purchase Insurance</btn>
+                <label for="insuredairline" class="mr-sm-2">Choose Your Airline</label>
+                <select class="form-control" id="insuredairline">                       
+                </select>  
+                <!-- <input type="text" class="form-control mb-2 mr-sm-1" id="insuredairline"> -->
+                <label for="insflight-number" class="mr-sm-2">Flight</label> <input type="text" class="form-control mb-2 mr-sm-1" id="insflight-number">
+                <label for="fundinsurance" class="mr-sm-2">Add Funds </label> <input type="text" class="form-control mb-2 mr-sm-1" id="fundinsurance">
+                <btn class="btn btn-primary" id="purchase-insurance">Purchase Insurance</btn>
         </form>
 </div>
 <div style="border:1px solid white" class="mb-2">
@@ -65,6 +75,9 @@
        
         
     </main>
+
+   <!-- <script src="contract.js"></script>
+    <script src="index.js"></script>-->
 
 </body>
 

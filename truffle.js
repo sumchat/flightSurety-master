@@ -1,5 +1,5 @@
 var HDWalletProvider = require("truffle-hdwallet-provider");
-var mnemonic = "report space gravity rule tourist hungry elevator nose spatial hamster exercise leaf";
+var mnemonic = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
 //var NonceTrackerSubprovider = require("web3-provider-engine/subproviders/nonce-tracker")
 
 module.exports = {
