@@ -4,9 +4,10 @@ FlightSurety is a sample application project for Udacity's Blockchain course.
 This repository containts an Ethereum DApp that interacts with the smart contract and Oracles that demonstrates a Airline registration and insurance payout to passengers in case pf airline delay. First airline is registered when contract is deployed.Only existing airline may register a new airline until there are at least four airlines registered. Registration of fifth and subsequent airlines requires multi-party consensus of 50% of registered airlines. Airline can be registered, but does not participate in contract until it submits funding of 10 ether.Passengers may pay up to 1 ether for purchasing flight insurance.If flight is delayed due to airline fault, passenger receives credit of 1.5X the amount they paid. Insurance payouts are not sent directly to passenger’s wallet.Passenger can withdraw any funds owed to them as a result of receiving credit for insurance payout.
 Oracle functionality is implemented in the server app.Upon startup, 20+ oracles are registered and their assigned indexes are persisted in memory.Update flight status requests from client Dapp result in OracleRequest event emitted by Smart Contract that is captured by server.Server will loop through all registered oracles, identify those oracles for which the OracleRequest event applies, and respond by calling into FlightSuretyApp contract with random status code of Unknown (0), On Time (10) or Late Airline (20), Late Weather (30), Late Technical (40), or Late Other (50)
 
-The DApp User Interface when running should look like...
 
 ![truffle test](images/COMMANDS.png)
+
+The DApp User Interface when running should look like...
 
 ![truffle test](images/FlightSurety.png)
 
