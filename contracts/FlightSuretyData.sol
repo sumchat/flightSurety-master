@@ -25,20 +25,40 @@ contract FlightSuretyData {
         uint    payout;   
     } */
     //this will track insurance for each airline
-    //use Pascal case for sruct
-    struct Airlineinsurance {
-        address  customer;  
-        string   flight; 
-        uint256  timestamp;  
-        uint     insuranceamount;  
-        uint    payout;   
-    }
    
-    mapping (bytes32 => Airlineinsurance[]) airlinesInsuranceHistory;
+    //use Pascal case for sruct
+    /* struct Airlineinsurance {
+        string cid;  
+        //string   flight; 
+        //uint256  timestamp;  
+        uint     insuranceamount;  
+        //uint    payout;   
+    }
+    struct Payment{
+        uint purchasedamount;
+        uint payout;
+    } */
+   
+    //mapping (bytes32 => Airlineinsurance[]) airlinesInsuranceHistory;
    // mapping (address => passengerInsurance[]) passengerInsuranceHistory;
-    mapping(address => uint256) private accountBalance;
+   //passenger => amount
+    mapping(address => uint) private accountBalance;
+    //flightkey => passengers
+    mapping(bytes32 =>address[]) private airlineinsurees;
+    //mapping(address =>mapping(bytes32 => Payment)) insuredamount;
+
+    //passenger =>(flightkey => amount)
+    mapping(address =>mapping(bytes32 => uint)) insuredamount;
+     mapping(address => uint) private fundedinsurance;
+
+    //flightkey =>(passenger => payout)
+    mapping(bytes32 =>mapping(address => uint)) insuredpayout;
+
+
+
+    //address[] public airlinesInsurances;
      // Max Fee to be paid when buying insurance
-    uint256 public constant MAX_INSURANCE_FEE = 1 ether;
+    
     uint256 public constant MIN_FUNDING_AMOUNT = 10 ether;
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
@@ -104,6 +124,8 @@ contract FlightSuretyData {
         _;
     } 
 
+    
+
     /*modifier requireisAirlineFunded(address airline)
     {
         require( fundedAirlines[airline] >= 10, "Airline must submit funds of 10 ether");
@@ -112,6 +134,17 @@ contract FlightSuretyData {
     /********************************************************************************************/
     /*                                       UTILITY FUNCTIONS                                  */
     /********************************************************************************************/
+
+    function isnotinsured(address airline,string flight,uint timestamp,address passenger)                     
+                    external
+                    view
+                    returns(bool)
+    {
+        bytes32 flightkey = getFlightKey(airline,flight,timestamp);
+        uint amount = insuredamount[passenger][flightkey];
+        return(amount == 0);
+    }
+
     function isAirlineRegistered(address airline)
                             public
                             view
@@ -215,7 +248,26 @@ contract FlightSuretyData {
     {
         return airlines;
     }
+
     
+    function getPassengerFunds(address passenger)
+                external
+                view
+                returns(uint) 
+
+
+    {
+        
+        return accountBalance[passenger];
+    }
+
+    function withdrawPassengerFunds(uint amount,address passenger)
+                                    external                
+                                    returns(uint)
+    {
+        accountBalance[passenger] = accountBalance[passenger] - amount;
+        return accountBalance[passenger];
+    }
 
 /**
   * @dev airline can deposit funds in any amount  
@@ -252,51 +304,29 @@ contract FlightSuretyData {
     {
         return (fundedAirlines[airline]);
     }
-
-
+  
    /**
     * @dev Buy insurance for a flight. If a passenger sends more than 1 ether then the excess is returned.
     *
     */   
     
-    function buy
-                            (  
-                              address  airline, 
-                              string flight,uint256 _timestamp,address sender, uint amount                           
-                            )
+     function buy (address  airline,string flight,uint256 _timestamp,address passenger,uint amount)          
                             external
                             requireIsOperational
                             requireIsCallerAuthorized
-                            requireIsCallerAirlineRegistered(airline)
-                            payable
+                            requireIsCallerAirlineRegistered(airline)                                                      
     {
         
-        uint excessamount = 0;
-        uint netamount = 0;
         bytes32 flightkey = getFlightKey(airline,flight,_timestamp);
-        if(amount > MAX_INSURANCE_FEE)
-        {
-            excessamount =  amount - MAX_INSURANCE_FEE;
-            netamount = MAX_INSURANCE_FEE;
-        }
-        else{
-            netamount = amount;
-        }
-
-       // passengerInsurance memory _cusinsurance = passengerInsurance({airline:airline,flight:flight,timestamp:_timestamp,insuranceamount:netamount,payout:0});
-       // passengerInsuranceHistory[sender].push(_cusinsurance);
-         Airlineinsurance memory _airinsurance = Airlineinsurance({customer:sender,flight:flight,timestamp:_timestamp,insuranceamount:netamount,payout:0});
-         //airlinesInsuranceHistory[flightkey] = _airinsurance;
-        airlinesInsuranceHistory[flightkey].push(_airinsurance);
-       /*  if(amount > MAX_INSURANCE_FEE)
-        {
-            sender.transfer(excessamount);
-        } */
-        
        
+        airlineinsurees[flightkey].push(passenger);
+       
+        insuredamount[passenger][flightkey]= amount;
+        insuredpayout[flightkey][passenger] = 0; 
+            
         
-    }
-
+    } 
+    uint public  total = 0;
     /**
      *  @dev Credits payouts to insurees
     */
@@ -313,18 +343,47 @@ contract FlightSuretyData {
     {
         //get all the insurees
         bytes32 flightkey = getFlightKey(airline,flight,timestamp);
-        Airlineinsurance[] storage insurees = airlinesInsuranceHistory[flightkey];
-         for(uint i = 0; i < insurees.length; i++) {
-            uint256 payout = insurees[i].insuranceamount.mul(15).div(10);
-            if(insurees[i].payout == 0)
+        address[] storage insurees = airlineinsurees[flightkey];
+
+       
+          for(uint8 i = 0; i < insurees.length; i++) {
+             address passenger = insurees[i];
+             
+            uint amount = insuredamount[passenger][flightkey];
+            uint256 payout = amount.mul(15).div(10);
+            //check if already paid
+            uint paid = insuredpayout[flightkey][passenger];
+            if(paid == 0)
             {
-                insurees[i].payout = payout;
-                accountBalance[insurees[i].customer].add(payout);     
-            }      
-        }
+                insuredpayout[flightkey][passenger] = payout;  
+                accountBalance[passenger] = payout;
+            }
+              
+        } 
     }
     
-
+    //functions to debug contract
+   /*  function getInsurees(address airline,string flight,uint ts) external view returns(address[])
+    {  
+        
+        bytes32 flightkey = getFlightKey(airline,flight,ts);
+        address[] storage insurees = airlineinsurees[flightkey];
+        return insurees; 
+    }
+     function getInsureesAmount(address airline,string flight,uint ts) external  returns(uint)
+    {  
+      
+        bytes32 flightkey = getFlightKey(airline,flight,ts);
+        address[] storage insurees = airlineinsurees[flightkey];
+          for(uint8 i = 0; i < insurees.length; i++) {
+                address passenger = insurees[i];
+                
+                total = total + accountBalance[passenger];
+          }
+          return total;
+        
+         
+    } */
     /**
      *  @dev Transfers eligible payout funds to insuree
      *

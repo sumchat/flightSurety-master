@@ -78,29 +78,18 @@ flightSuretyApp.events.OracleRequest({
       const airline = event.returnValues.airline;
       const flight = event.returnValues.flight;
       const timestamp = event.returnValues.timestamp;      
-      let randomstatusCode = STATUSCODES[Math.floor(Math.random()*STATUSCODES.length)];
-      console.log("statuscode is:" + randomstatusCode);
+      //let randomstatusCode = STATUSCODES[Math.floor(Math.random()*STATUSCODES.length)];
+      //console.log("statuscode is:" + randomstatusCode);
       for(var key in oracles)
       {
         var indexes = oracles[key];
         if(indexes.includes(index))
         {          
-         // let randomstatusCode = STATUSCODES[Math.floor(Math.random()*STATUSCODES.length)];
-          flightSuretyApp.methods.submitOracleResponse(index, airline, flight, timestamp, randomstatusCode)
-         /*  .send({ from: key},(error,result)=>
-        {
-          if(error)
-          {
-          console.log("Error while sending Oracle response  for "+ flight);
-          }
-          else
-          {
-            console.log("Oracle response sent with statuscode:"+  randomstatusCode + " for "+ flight)
-          }
-        }) */
-          .send({ from: key})
+          let randomstatusCode = STATUS_CODE_LATE_AIRLINE;//STATUSCODES[Math.floor(Math.random()*STATUSCODES.length)];
+          flightSuretyApp.methods.submitOracleResponse(index, airline, flight, timestamp, randomstatusCode)       
+          .send({ from: key,gas:1000000})
           .then(result =>{
-            console.log("Oracle response sent with statuscode: "  + randomstatusCode + " for "+ flight)
+            console.log("Oracle response sent with statuscode: "  + randomstatusCode + " for "+ flight + " and index:"+ index);
           })
           .catch(error =>{
             console.log("Error while sending Oracle response  for "+ flight + " Error:" + error)
@@ -120,6 +109,7 @@ app.get('/api', (req, res) => {
       message: 'An API for use with your Dapp!'
     })
 })
+
 
 export default app;
 
