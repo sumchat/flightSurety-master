@@ -26,6 +26,7 @@ contract FlightSuretyApp {
     uint8 private constant STATUS_CODE_LATE_OTHER = 50;
     uint8 private constant MULTIPARTY_CONSENSUS_COUNT = 4;
     uint256 public constant MAX_INSURANCE_FEE = 1 ether;
+    uint256 public constant MIN_FUNDING_AMOUNT = 10 ether;
     address private contractOwner;          // Account used to deploy contract
     uint8 public airlinesRegisteredCount = 1;
 
@@ -41,6 +42,7 @@ contract FlightSuretyApp {
         address airline;
         bool  poll;
     }
+     
 
    //it contains the list of airline addresses which are voting for another airline
    //<<airlinebeingregistered> => (<callingairline> => bool)
@@ -102,16 +104,22 @@ contract FlightSuretyApp {
     }
     modifier requireDidCallerAirlineDepositFunds()
     {
-        require(_flightSuretyData.isAirlineFunded(msg.sender), "Airline can not participate in contract until it submits 10 ether");
+        bool funded = false;
+        uint funds = _flightSuretyData.getAirlineFunds(msg.sender);
+        if(funds >= MIN_FUNDING_AMOUNT)
+            funded = true;
+       
+        require(funded == true, "Airline can not participate in contract until it submits 10 ether");
         _;
     }
     
     modifier requireIsTimestampValid(uint timestamp)
     {
        uint currentTime = block.timestamp;
-       require(timestamp < currentTime,"Timetstamp is not valid");
+       require(timestamp >= currentTime,"Timetstamp is not valid");
         _;
     }
+     
 
     modifier requireDidNotpurchaseInsurance(address airline,string flight,uint timestamp)
     {
@@ -265,15 +273,17 @@ contract FlightSuretyApp {
                                 )
                                 internal
                                 requireIsOperational
+                               
     {
+       // address[] memory insurees = _flightSuretyData.getInsurees(airline, flight, timestamp);        
+      
         
-       // _flightSuretyData.creditInsurees(airline, flight, timestamp);
-        
-         if(statusCode == STATUS_CODE_LATE_AIRLINE) {
-             _flightSuretyData.creditInsurees(airline, flight, timestamp);
-         }
+           if(statusCode == STATUS_CODE_LATE_AIRLINE) {
+           
+             _flightSuretyData.creditInsurees(airline, flight, timestamp,15,10);
+         } 
     }
-
+   
   /*  function getBalancetest() public view returns(uint)
    {
     return balance;
@@ -548,16 +558,20 @@ contract FlightSuretyData {
     //address [] public insurees;
     function isOperational() public view returns(bool);
     function isAirlineRegistered(address airline) public view returns (bool);   
-    function isAirlineFunded(address airline) public view returns (bool);
+   // function isAirlineFunded(address airline) public view returns (bool);
     function registerAirline(address airline) external returns (bool success);
     function fundAirline(address airline,uint amount) external;    
     function buy(address airline, string flight, uint256 timestamp,address passenger, uint256 amount) external;
-    function creditInsurees(address airline, string flight, uint256 timestamp) external;
+    function creditInsurees(address airline, string flight, uint256 timestamp,uint factor_numerator,uint factor_denominator) external;
     function getAirlines() external view returns(address[]);
     function getAirlineFunds(address airline) external view  returns(uint funds);     
     function isnotinsured(address airline,string flight,uint timestamp,address passenger) external view returns(bool); 
     function getPassengerFunds(address passenger) external view returns(uint);  
-    function withdrawPassengerFunds(uint amount,address passenger) external returns(uint);      
+    function withdrawPassengerFunds(uint amount,address passenger) external returns(uint);    
+    // function getInsurees(address airline,string flight,uint ts)  external view returns(address[]);
+    /* function isAmountNotPaid(address airline,string flight,uint ts,address passenger) external view returns(bool);
+    function getInsuredAmount(address airline,string flight,uint ts,address passenger) external view returns(uint); 
+    function pay(address airline,string flight,uint ts,address passenger,uint payout) external; */                                                        
                                                   
     /* function getInsurees(address airline,string flight,uint ts) external view returns(address[]);     
     function getInsureesAmount(address airline,string flight,uint ts) external view returns(uint);  */                     

@@ -91,18 +91,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
   });
 
-  it('can register oracles', async () => {
-    
-    // ARRANGE
-    let fee = 1000;//await config.flightSuretyApp.REGISTRATION_FEE.call();
-
-    // ACT
-   // for(let a=12; a<15; a++) {      
-      await config.flightSuretyApp.registerOracle({ from: accounts[12], value: fee });
-     // let result = await config.flightSuretyApp.getMyIndexes.call({from: accounts[12]});
-     // console.log(`Oracle Registered: ${result[0]}, ${result[1]}, ${result[2]}`);
-    });
-  //});
+  
  
 
 });

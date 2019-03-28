@@ -1,5 +1,6 @@
 pragma solidity ^0.4.25;
 
+
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract FlightSuretyData {
@@ -17,13 +18,11 @@ contract FlightSuretyData {
     address[] airlines;
 
 //this will track insurance for each passenger
-   /*  struct passengerInsurance {
-        address  airline;  
-        string   flight; 
-        uint256  timestamp;  
+  /*    struct PassengerInsurance {
+        address  passenger;           
         uint     insuranceamount;  
-        uint    payout;   
-    } */
+        uint     payout;   
+    }  */
     //this will track insurance for each airline
    
     //use Pascal case for sruct
@@ -55,11 +54,11 @@ contract FlightSuretyData {
     mapping(bytes32 =>mapping(address => uint)) insuredpayout;
 
 
-
+   
     //address[] public airlinesInsurances;
      // Max Fee to be paid when buying insurance
     
-    uint256 public constant MIN_FUNDING_AMOUNT = 10 ether;
+    //uint256 public constant MIN_FUNDING_AMOUNT = 10 ether;
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
@@ -156,16 +155,17 @@ contract FlightSuretyData {
     * @dev airline can only take part in registration of other airlines
     *     if it has more than 10 ether in its balance  
     */
-    function isAirlineFunded(address airline)
+    /* function isAirlineFunded(address airline)
                             public
                             view
                             returns (bool)
     {
+
         if(fundedAirlines[airline] >= MIN_FUNDING_AMOUNT)
             return true;
         else
             return false;
-    }
+    } */
     /**
     * @dev Get operating status of contract
     *
@@ -207,6 +207,7 @@ contract FlightSuretyData {
                             requireContractOwner
     {
         authorizedContracts[contractAddress] = 1;
+       
     }
 
     function deauthorizeCaller
@@ -262,10 +263,14 @@ contract FlightSuretyData {
     }
 
     function withdrawPassengerFunds(uint amount,address passenger)
-                                    external                
+                                    external    
+                                    requireIsOperational                                     
+                                    requireIsCallerAuthorized                                               
                                     returns(uint)
     {
         accountBalance[passenger] = accountBalance[passenger] - amount;
+        passenger.transfer(amount);
+
         return accountBalance[passenger];
     }
 
@@ -318,6 +323,9 @@ contract FlightSuretyData {
     {
         
         bytes32 flightkey = getFlightKey(airline,flight,_timestamp);
+
+       // PassengerInsurance memory pinsurance = PassengerInsurance({passenger:_passenger,insuranceamount:amount,payout:0});
+        //airlineInsurance[flightkey].push(pinsurance);
        
         airlineinsurees[flightkey].push(passenger);
        
@@ -334,7 +342,10 @@ contract FlightSuretyData {
                                 (
                                     address airline,
                                     string flight,
-                                    uint256 timestamp
+                                    uint256 timestamp,
+                                    uint factor_numerator,
+                                    uint factor_denominator
+                                                       
                                 )
                                 external
                                 requireIsOperational
@@ -343,34 +354,85 @@ contract FlightSuretyData {
     {
         //get all the insurees
         bytes32 flightkey = getFlightKey(airline,flight,timestamp);
-        address[] storage insurees = airlineinsurees[flightkey];
-
+        
+         address[] storage insurees = airlineinsurees[flightkey];
+       
        
           for(uint8 i = 0; i < insurees.length; i++) {
              address passenger = insurees[i];
-             
+             uint256 payout;
             uint amount = insuredamount[passenger][flightkey];
-            uint256 payout = amount.mul(15).div(10);
+            
             //check if already paid
             uint paid = insuredpayout[flightkey][passenger];
             if(paid == 0)
             {
+             // bool success = _appcontract.call(bytes4(keccak256("calculatePayout(uint256)")), amount);
+                payout = amount.mul(factor_numerator).div(factor_denominator);               
+               
                 insuredpayout[flightkey][passenger] = payout;  
-                accountBalance[passenger] = payout;
+                accountBalance[passenger] += payout;
+                
             }
               
         } 
-    }
+    } 
+
+
     
     //functions to debug contract
-   /*  function getInsurees(address airline,string flight,uint ts) external view returns(address[])
-    {  
+    /*  function getInsurees(address airline,string flight,uint ts) 
+                        external
+                         view
+                         requireIsOperational
+                        requireIsCallerAuthorized 
+                        returns(PassengerInsurance[])
+        {  
+           
+       // PassengerInsurance memory pinsurance
+             bytes32 flightkey = getFlightKey(airline,flight,ts);
+            PassengerInsurance[] storage insurees = airlineInsurance[flightkey];//airlineinsurees[flightkey];
+
+            return insurees; 
+        } */
+/*
+         function isAmountNotPaid(address airline,string flight,uint ts,address passenger) 
+                        external
+                         view
+                         requireIsOperational
+                        requireIsCallerAuthorized 
+                        returns(bool)
+        {  
         
-        bytes32 flightkey = getFlightKey(airline,flight,ts);
-        address[] storage insurees = airlineinsurees[flightkey];
-        return insurees; 
-    }
-     function getInsureesAmount(address airline,string flight,uint ts) external  returns(uint)
+            bytes32 flightkey = getFlightKey(airline,flight,ts);
+            uint paid = insuredpayout[flightkey][passenger];
+            return (paid == 0); 
+        } */
+
+        function getAccountBalance(address passenger)
+                                    external
+                                    view
+                                    requireIsOperational
+                                    requireIsCallerAuthorized 
+                                    returns(uint)
+             {
+                return accountBalance[passenger];
+             }
+
+       /*  function getInsuredAmount(address airline,string flight,uint ts,address passenger) 
+                        external
+                         view
+                         requireIsOperational
+                        requireIsCallerAuthorized 
+                        returns(uint)
+        {  
+        
+            bytes32 flightkey = getFlightKey(airline,flight,ts);
+            uint amount = insuredamount[passenger][flightkey];
+            return amount; 
+        } */
+
+    /* function getInsureesAmount(address airline,string flight,uint ts) external  returns(uint)
     {  
       
         bytes32 flightkey = getFlightKey(airline,flight,ts);
@@ -389,19 +451,22 @@ contract FlightSuretyData {
      *
     */
     function pay
-                            (
-                                address customerAddress
+                            (   address airline,string flight,uint ts,
+                                address passenger,
+                                uint payout
                             )
                             external
                             requireIsOperational
                             requireIsCallerAuthorized
                             
     {
-        
+        bytes32 flightkey = getFlightKey(airline,flight,ts);
+        insuredpayout[flightkey][passenger] = payout;  
+        accountBalance[passenger] += payout;
 
-        uint256 prev = accountBalance[customerAddress];
-        accountBalance[customerAddress] = 0;
-        customerAddress.transfer(prev);
+        //uint256 prev = accountBalance[customerAddress];
+        //accountBalance[customerAddress] = 0;
+        //passenger.transfer(payout);
     }
 
    /**

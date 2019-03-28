@@ -9,7 +9,7 @@ module.exports = {
         return new HDWalletProvider(mnemonic, "http://127.0.0.1:8545/", 0, 50);
       },      
       network_id: '*',
-      gas: 4500000,
+      gas: 4698712,
       //network_id: 4,
       //gas: 4500000,
       gasPrice: 1000000,
@@ -17,7 +17,12 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: "^0.4.24"
+      version: "^0.4.24",
+      optimizer: {
+        enabled: true,
+        //runs: 200
+      }
     }
+    
   }
 };
